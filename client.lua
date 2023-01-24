@@ -1,5 +1,5 @@
--- Author: Otacon
--- Github: https://github.com/Dr-Otacon/esx_holster
+-- Author: Otacon & Mycroft
+-- Origonal Github: https://github.com/Dr-Otacon/esx_holster
 
 ----------GANG ANIMATION WEAPONS----------
 local weaponsFull = {
@@ -74,6 +74,23 @@ local weaponsLarge = {
 	"WEAPON_SPECIALCARBINE_MK2",
 }
 
+--- Variables ------
+local holstered  = true
+local hasWeapon				= false
+local currWeapon 	    	= joaat("WEAPON_UNARMED")
+local animateTrunk 			= false
+local hasWeaponH  			= false
+local hasWeaponL      		= false
+local weaponL         		= joaat("WEAPON_UNARMED")
+local has_weapon_on_back 	= false
+local racking         		= false
+local holster 				= 0
+local blocked 				= false
+local sex 					= 0
+local handOnHolster 		= false
+local holsterHold			= false
+local ped					= nil
+
 
 --- VISUAL WEAPONS ----
 
@@ -87,92 +104,53 @@ local SETTINGS = {
 	z_rotation = 0.0,
 	compatable_weapon_hashes = {
 			-- assault rifles:
-			["w_sg_pumpshotgunmk2"] = GetHashKey("WEAPON_PUMPSHOTGUN_MK2"),
-			["w_ar_carbineriflemk2"] = GetHashKey("WEAPON_CARBINERIFLE_MK2"),
-			["w_ar_assaultrifle"] = GetHashKey("WEAPON_ASSAULTRIFLE"),
-			["w_sg_pumpshotgun"] = GetHashKey("WEAPON_PUMPSHOTGUN"),
-			["w_ar_carbinerifle"] = GetHashKey("WEAPON_CARBINERIFLE"),
-			["w_ar_assaultrifle_smg"] = GetHashKey("WEAPON_COMPACTRIFLE"),
-			["w_sb_smg"] = GetHashKey("WEAPON_SMG"),
-			["w_sb_pdw"] = GetHashKey("WEAPON_COMBATPDW"),
-			["w_mg_mg"] = GetHashKey("WEAPON_MG"),
-			["w_sb_gusenberg"] = GetHashKey("WEAPON_GUSENBERG"),
-			["w_ar_advancedrifle"] = GetHashKey("WEAPON_ADVANCEDRIFLE"),
-			["w_sr_sniperrifle"] = GetHashKey("WEAPON_SNIPERRIFLE"),
-			["w_ar_assaultriflemk2"] = GetHashKey("WEAPON_ASSAULTRIFLE_MK2"),
-			["w_mg_combatmgmk2"] = GetHashKey("WEAPON_COMBATMG_MK2"),
-			["w_ar_musket"] = GetHashKey("WEAPON_MUSKET"),
-			["w_ar_specialcarbine"] = GetHashKey("WEAPON_SPECIALCARBINE"),
-			["w_sb_smgmk2"] = GetHashKey("WEAPON_SMG_MK2"),
-			["w_ar_specialcarbinemk2"] = GetHashKey("WEAPON_SPECIALCARBINE_MK2"),
+			["w_sg_pumpshotgunmk2"] = joaat("WEAPON_PUMPSHOTGUN_MK2"),
+			["w_ar_carbineriflemk2"] = joaat("WEAPON_CARBINERIFLE_MK2"),
+			["w_ar_assaultrifle"] = joaat("WEAPON_ASSAULTRIFLE"),
+			["w_sg_pumpshotgun"] = joaat("WEAPON_PUMPSHOTGUN"),
+			["w_ar_carbinerifle"] = joaat("WEAPON_CARBINERIFLE"),
+			["w_ar_assaultrifle_smg"] = joaat("WEAPON_COMPACTRIFLE"),
+			["w_sb_smg"] = joaat("WEAPON_SMG"),
+			["w_sb_pdw"] = joaat("WEAPON_COMBATPDW"),
+			["w_mg_mg"] = joaat("WEAPON_MG"),
+			["w_sb_gusenberg"] = joaat("WEAPON_GUSENBERG"),
+			["w_ar_advancedrifle"] = joaat("WEAPON_ADVANCEDRIFLE"),
+			["w_sr_sniperrifle"] = joaat("WEAPON_SNIPERRIFLE"),
+			["w_ar_assaultriflemk2"] = joaat("WEAPON_ASSAULTRIFLE_MK2"),
+			["w_mg_combatmgmk2"] = joaat("WEAPON_COMBATMG_MK2"),
+			["w_ar_musket"] = joaat("WEAPON_MUSKET"),
+			["w_ar_specialcarbine"] = joaat("WEAPON_SPECIALCARBINE"),
+			["w_sb_smgmk2"] = joaat("WEAPON_SMG_MK2"),
+			["w_ar_specialcarbinemk2"] = joaat("WEAPON_SPECIALCARBINE_MK2"),
 	}
 }
 
 local attached_weapons = {}
 -------END VISUAL WEAPONS
- 
---- Variables ------
-local holstered  = true
-local PlayerData = {}
-local ESX        = nil
-
-local hasWeapon 			= false
-local currWeapon 	    = GetHashKey("WEAPON_UNARMED")
-local animateTrunk 		= false
-local hasWeaponH  		= false
-local hasWeaponL      = false
-local weaponL         = GetHashKey("WEAPON_UNARMED")
-local has_weapon_on_back = false
-local racking         = false
-local holster 				= 0
-local blocked 				= false
-local sex 						= 0
-local holsterButton 	= 20
-local handOnHolster 	= false
-local holsterHold			= false
-local ped							= nil
------------------------
- 
-Citizen.CreateThread(function()
-    while ESX == nil do
-        TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-        Citizen.Wait(0)
-    end
-end)
-
-RegisterNetEvent('esx:playerLoaded')
-AddEventHandler('esx:playerLoaded', function(xPlayer)
-  PlayerData = xPlayer
-end)
-
-RegisterNetEvent('esx:setJob')
-AddEventHandler('esx:setJob', function(job)
-  PlayerData.job = job
-end)
 
 -- selects which holster
 RegisterCommand("holster", function(source, args, raw)
 	-- No Holster
     if args[1] == '0' then
 		holster = 0
-		ESX.ShowNotification('No Holster')
+		Config.Notification('No Holster')
 	-- Chain 8
     elseif args[1] == '1' then
 		holster = 1
-		ESX.ShowNotification('Holster Chain 8')
+		Config.Notification('Holster Chain 8')
 	-- Chain 6
     elseif args[1] == '2' then
 		holster = 2
-		ESX.ShowNotification('Holster Chain 6')
+		Config.Notification('Holster Chain 6')
 	-- T-shirt 15
     elseif args[1] == '3' then
 		holster = 3
-		ESX.ShowNotification('Holster T-Shirt 15')
+		Config.Notification('Holster T-Shirt 15')
 		elseif args[1] == '4' then
 		holster = 4
-		ESX.ShowNotification('Holster Chain 1')
+		Config.Notification('Holster Chain 1')
     else
-        ESX.ShowNotification('Incorrect use: /holster 0,1,2,3')
+        Config.Notification('Incorrect use: /holster 0,1,2,3')
     end
 end, false)
 
@@ -180,22 +158,22 @@ end, false)
 RegisterCommand("sex", function(source, args, raw)
     if args[1] == 'm' then
 		sex = 0
-		ESX.ShowNotification('Holster set to Male')
+		Config.Notification('Holster set to Male')
     elseif args[1] == 'f' then
 		sex = 1
-		ESX.ShowNotification('holster set to Female')
+		Config.Notification('holster set to Female')
 	else
-        ESX.ShowNotification('Incorrect use: /sex m,f')
+        Config.Notification('Incorrect use: /sex m,f')
     end
 end, false)
 
 
  -- MAIN FUNCTION
- Citizen.CreateThread(function()
-	local newWeapon = GetHashKey("WEAPON_UNARMED")
+ CreateThread(function()
+	local newWeapon = joaat("WEAPON_UNARMED")
 	while true do
-		Citizen.Wait(1)
-		ped = PlayerPedId()
+		Wait(500)
+		local ped = PlayerPedId()
 		if DoesEntityExist( ped ) and not IsEntityDead( ped ) and not IsPedInAnyVehicle(ped, true) then
 			newWeapon = GetSelectedPedWeapon(ped)
 			if newWeapon ~= currWeapon then
@@ -259,9 +237,10 @@ function drawWeaponLarge(ped, newWeapon)
 	end
 
 	local door = isNearDoor()
-	if PlayerData.job.name == 'police' and (door == 'driver' or door == 'passenger') then
+	if door == 'driver' or door == 'passenger' then
 		blocked = true
-		local coordA = GetEntityCoords(ped, 1)
+		BlockInputs()
+		local coordA = GetEntityCoords(ped)
 		local coordB = GetOffsetFromEntityInWorldCoords(ped, 0.0, 2.0, 0.0)
 		local vehicle = getVehicleInDirection(coordA, coordB)
 		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
@@ -285,14 +264,15 @@ function drawWeaponLarge(ped, newWeapon)
 		weaponL = newWeapon
 		hasWeaponL = true
 	elseif not isNearTrunk() then
-		SetCurrentPedWeapon(ped, GetHashKey("WEAPON_UNARMED"), true)
-		ESX.ShowNotification('You need to be at a trunk to draw that weapon!')
+		SetCurrentPedWeapon(ped, joaat("WEAPON_UNARMED"), true)
+		Config.Notification('You need to be at a trunk to draw that weapon!')
 	else
 		blocked = true
+		BlockInputs()
 		removeWeaponOnBack()
 		startAnim("mini@repair", "fixing_a_ped")
 		blocked = false
-		local coordA = GetEntityCoords(ped, 1)
+		local coordA = GetEntityCoords(ped)
 		local coordB = GetOffsetFromEntityInWorldCoords(ped, 0.0, 2.0, 0.0)
 		local vehicle = getVehicleInDirection(coordA, coordB)
 		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
@@ -307,7 +287,7 @@ end
 --- Checks if large weapon
 function checkWeaponLarge(ped, newWeapon)
 	for i = 1, #weaponsLarge do
-		if GetHashKey(weaponsLarge[i]) == newWeapon then
+		if joaat(weaponsLarge[i]) == newWeapon then
 			return true
 		end
 	end
@@ -318,15 +298,10 @@ end
 function startAnim(lib, anim)
 	RequestAnimDict(lib)
 	while not HasAnimDictLoaded( lib) do
-		Citizen.Wait(1)
+		Wait(1)
 	end
-
 	TaskPlayAnim(ped, lib ,anim ,8.0, -8.0, -1, 0, 0, false, false, false )
-	if PlayerData.job.name == 'police' then
-		Citizen.Wait(2000)
-	else
-		Citizen.Wait(4000)
-	end
+	Wait(4000)
 	ClearPedTasksImmediately(ped)
 end
 
@@ -340,14 +315,15 @@ function holsterWeaponL()
 	pos = GetEntityCoords(ped, true)
 	rot = GetEntityHeading(ped)
 	blocked = true
+	BlockInputs()
 	TaskPlayAnimAdvanced(ped, "reaction@intimidation@1h", "outro", pos, 0, 0, rot, 8.0, 3.0, -1, 50, 0.125, 0, 0)
-	Citizen.Wait(500)
-	SetCurrentPedWeapon(ped, GetHashKey('WEAPON_UNARMED'), true)
+	Wait(500)
+	SetCurrentPedWeapon(ped, joaat('WEAPON_UNARMED'), true)
 	placeWeaponOnBack()
-	Citizen.Wait(1500)
+	Wait(1500)
 	ClearPedTasks(ped)
 	blocked = false
-	SetCurrentPedWeapon(ped, GetHashKey("WEAPON_UNARMED"), true)
+	SetCurrentPedWeapon(ped, joaat("WEAPON_UNARMED"), true)
 	hasWeaponL = false
 end
 
@@ -356,11 +332,12 @@ function drawWeaponOnBack()
 	pos = GetEntityCoords(ped, true)
 	rot = GetEntityHeading(ped)
 	blocked = true
+	BlockInputs()
 	loadAnimDict( "reaction@intimidation@1h" )
 	TaskPlayAnimAdvanced(ped, "reaction@intimidation@1h", "intro", pos, 0, 0, rot, 8.0, 3.0, -1, 50, 0.325, 0, 0)
 	removeWeaponOnBack()
 	SetCurrentPedWeapon(ped, weaponL, true)
-	Citizen.Wait(2000)
+	Wait(2000)
 	ClearPedTasks(ped)
 	blocked = false
 	hasWeaponL = true
@@ -368,27 +345,26 @@ end
 
 --- Removes model of weapon from back
 function removeWeaponOnBack()
-	print("REMOVING WEAPON MODEL FROM BACK")
 	has_weapon_on_back = false
 end
 
 -- Places model of weapon on back
 function placeWeaponOnBack()
-	print("PLACING WEAPON MODEL ON BACK")
 	has_weapon_on_back = true
 end
 
 --Command to rack weapon in vehicle
 RegisterCommand('rack', function()
-	SetCurrentPedWeapon(ped, GetHashKey("WEAPON_UNARMED"), true)
+	SetCurrentPedWeapon(ped, joaat("WEAPON_UNARMED"), true)
 	racking = true
 end, false)
 
 function rackWeapon()
 	local door = isNearDoor()
-	if PlayerData.job.name == 'police' and (door == 'driver' or door == 'passenger') then
+	if (door == 'driver' or door == 'passenger') then
 		blocked = true
-		local coordA = GetEntityCoords(ped, 1)
+		BlockInputs()
+		local coordA = GetEntityCoords(ped)
 		local coordB = GetOffsetFromEntityInWorldCoords(ped, 0.0, 2.0, 0.0)
 		local vehicle = getVehicleInDirection(coordA, coordB)
 		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
@@ -408,23 +384,24 @@ function rackWeapon()
 				SetVehicleDoorShut(vehicle, 1, false, false)
 			end
 		end
-		WeaponL = GetHashKey("WEAPON_UNARMED")
+		WeaponL = joaat("WEAPON_UNARMED")
 		
 	elseif isNearTrunk() then
 		blocked = true
+		BlockInputs()
 		removeWeaponOnBack()
 		startAnim("mini@repair", "fixing_a_ped")
 		blocked = false
-		local coordA = GetEntityCoords(ped, 1)
+		local coordA = GetEntityCoords(ped)
 		local coordB = GetOffsetFromEntityInWorldCoords(ped, 0.0, 2.0, 0.0)
 		local vehicle = getVehicleInDirection(coordA, coordB)
 		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
 			SetVehicleDoorShut(vehicle, 5, false, false)
 		end
-		WeaponL = GetHashKey("WEAPON_UNARMED")
+		WeaponL = joaat("WEAPON_UNARMED")
 		hasWeaponL = false
 	else
-		ESX.ShowNotification('You need to be at a trunk to put away your weapon!')
+		Config.Notification('You need to be at a trunk to put away your weapon!')
 	end
 	racking = false
 end
@@ -432,10 +409,10 @@ end
 -------------END WEAPON ON BACK--------------
 -------------WEAPON ON BACK VISUAL-----------
 
-Citizen.CreateThread(function()
+CreateThread(function()
   while true do
-			local me = GetPlayerPed(-1)
-			Citizen.Wait(10)
+		local me = PlayerPedId()
+		Wait(200)
       ---------------------------------------
       -- attach if player has large weapon --
       ---------------------------------------
@@ -461,7 +438,7 @@ Citizen.CreateThread(function()
 end)
 
 function AttachWeapon(attachModel,modelHash,boneNumber,x,y,z,xR,yR,zR, isMelee)
-	local bone = GetPedBoneIndex(GetPlayerPed(-1), boneNumber)
+	local bone = GetPedBoneIndex(PlayerPedId(), boneNumber)
 	RequestModel(attachModel)
 	while not HasModelLoaded(attachModel) do
 		Wait(100)
@@ -469,12 +446,12 @@ function AttachWeapon(attachModel,modelHash,boneNumber,x,y,z,xR,yR,zR, isMelee)
 
   attached_weapons[attachModel] = {
     hash = modelHash,
-    handle = CreateObject(GetHashKey(attachModel), 1.0, 1.0, 1.0, true, true, false)
+    handle = CreateObject(joaat(attachModel), 1.0, 1.0, 1.0, true, true, false)
   }
 
   if isMelee then x = 0.11 y = -0.14 z = 0.0 xR = -75.0 yR = 185.0 zR = 92.0 end -- reposition for melee items
   if attachModel == "prop_ld_jerrycan_01" then x = x + 0.3 end
-	AttachEntityToEntity(attached_weapons[attachModel].handle, GetPlayerPed(-1), bone, x, y, z, xR, yR, zR, 1, 1, 0, 0, 2, 1)
+	AttachEntityToEntity(attached_weapons[attachModel].handle, PlayerPedId(), bone, x, y, z, xR, yR, zR, 1, 1, 0, 0, 2, 1)
 end
 
 function isMeleeWeapon(wep_name)
@@ -493,17 +470,17 @@ end
 
 --- Checks if player is near trunk
 function isNearTrunk()
-	local coordA = GetEntityCoords(ped, 1)
+	local coordA = GetEntityCoords(ped)
 	local coordB = GetOffsetFromEntityInWorldCoords(ped, 0.0, 2.0, 0.0)
 	local vehicle = getVehicleInDirection(coordA, coordB)
 	if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
 		local trunkpos = GetWorldPositionOfEntityBone(vehicle, GetEntityBoneIndexByName(vehicle, "boot"))
 		local lTail = GetWorldPositionOfEntityBone(vehicle, GetEntityBoneIndexByName(vehicle, "taillight_l"))
 		local rTail = GetWorldPositionOfEntityBone(vehicle, GetEntityBoneIndexByName(vehicle, "taillight_r"))
-		local playerpos = GetEntityCoords(ped, 1)
-		local distanceToTrunk = GetDistanceBetweenCoords(trunkpos, playerpos, 1)
-		local distanceToLeftT = GetDistanceBetweenCoords(lTail, playerpos, 1)
-		local distanceToRightT = GetDistanceBetweenCoords(rTail, playerpos, 1)
+		local playerpos = GetEntityCoords(ped)
+		local distanceToTrunk = #(trunkpos - playerpos)
+		local distanceToLeftT = #(lTail - playerpos)
+		local distanceToRightT = #(rTail - playerpos)
 		if distanceToTrunk < 1.5 then
 			SetVehicleDoorOpen(vehicle, 5, false, false)
 			return true
@@ -517,13 +494,13 @@ function isNearTrunk()
 end
 
 function isNearDoor()
-	local coordA = GetEntityCoords(ped, 1)
+	local coordA = GetEntityCoords(ped)
 	local coordB = GetOffsetFromEntityInWorldCoords(ped, 0.0, 2.0, 0.0)
 	local vehicle = getVehicleInDirection(coordA, coordB)
 	if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
 		local dDoor = GetWorldPositionOfEntityBone(vehicle, GetEntityBoneIndexByName(vehicle, "door_dside_f"))
 		local pDoor = GetWorldPositionOfEntityBone(vehicle, GetEntityBoneIndexByName(vehicle, "door_pside_f"))
-		local playerpos = GetEntityCoords(ped, 1)
+		local playerpos = GetEntityCoords(ped)
 		local distanceToDriverDoor = GetDistanceBetweenCoords(dDoor, playerpos, 1)
 		local distanceToPassengerDoor = GetDistanceBetweenCoords(pDoor, playerpos, 1)
 		if distanceToDriverDoor < 2.0 then
@@ -542,13 +519,12 @@ function getVehicleInDirection(coordFrom, coordTo)
 	local _, _, _, _, vehicle = GetRaycastResult(rayHandle)
 	return vehicle
 end
-------------- END LARGE WEAPON STUFF ----------------------------
 
-------------- END WEAPON HOLSTER -----------------------
+------------- START WEAPON HOLSTER -----------------------
 
 function checkWeaponHolster(ped, newWeapon)
 	for i = 1, #weaponsHolster do
-		if GetHashKey(weaponsHolster[i]) == newWeapon then
+		if joaat(weaponsHolster[i]) == newWeapon then
 			return true
 		end
 	end
@@ -558,13 +534,14 @@ end
 -- Puts weapons in holster
 function holsterWeaponH(ped, currentWeapon)
 	blocked = true
+	BlockInputs()
 	SetCurrentPedWeapon(ped, currentWeapon, true)
 	loadAnimDict("reaction@intimidation@cop@unarmed")
 	TaskPlayAnim(ped, "reaction@intimidation@cop@unarmed", "outro", 8.0, 2.0, -1, 48, 10, 0, 0, 0 )
 	addWeaponHolster()
-	Citizen.Wait(200)
-	SetCurrentPedWeapon(ped, GetHashKey("WEAPON_UNARMED"), true)
-	Citizen.Wait(1000)
+	Wait(200)
+	SetCurrentPedWeapon(ped, joaat("WEAPON_UNARMED"), true)
+	Wait(1000)
 	ClearPedTasks(ped)
 	hasWeapon = false
 	hasWeaponH = false
@@ -574,22 +551,23 @@ end
 --Draws Weapons from holster
 function drawWeaponH(ped, newWeapon)
 	blocked = true
+	BlockInputs()
 	loadAnimDict("rcmjosh4")
   loadAnimDict("weapons@pistol@")
 	loadAnimDict("reaction@intimidation@cop@unarmed")
 	if not handOnHolster then
-		SetCurrentPedWeapon(ped, GetHashKey("WEAPON_UNARMED"), true)
+		SetCurrentPedWeapon(ped, joaat("WEAPON_UNARMED"), true)
 		TaskPlayAnim(ped, "reaction@intimidation@cop@unarmed", "intro", 8.0, 2.0, -1, 50, 2.0, 0, 0, 0 )
-		Citizen.Wait(300)
+		Wait(300)
 	end
 	while holsterHold do
-		Citizen.Wait(1)
+		Wait(1)
 	end
 	TaskPlayAnim(ped, "rcmjosh4", "josh_leadout_cop2", 8.0, 2.0, -1, 48, 10, 0, 0, 0 )
 	SetCurrentPedWeapon(ped, newWeapon, true)
 	removeWeaponHolster()
 	if not handOnHolster then
-		Citizen.Wait(300)
+		Wait(300)
 	end
   ClearPedTasks(ped)
 	hasWeaponH = true
@@ -632,9 +610,6 @@ function addWeaponHolster()
 	end
 end
 
-------------- END WEAPON HOLSTER -----------------------
-
-
 ------------- START GANG WEAPON ------------------------
 
 -- Holsters all other weapons
@@ -646,10 +621,11 @@ function holsterWeapon(ped, currentWeapon)
 		pos = GetEntityCoords(ped, true)
 		rot = GetEntityHeading(ped)
 		blocked = true
+		BlockInputs()
 		TaskPlayAnimAdvanced(ped, "reaction@intimidation@1h", "outro", GetEntityCoords(ped, true), 0, 0, rot, 8.0, 3.0, -1, 50, 0.125, 0, 0)
-		Citizen.Wait(500)
-		SetCurrentPedWeapon(ped, GetHashKey('WEAPON_UNARMED'), true)
-		Citizen.Wait(1500)
+		Wait(500)
+		SetCurrentPedWeapon(ped, joaat('WEAPON_UNARMED'), true)
+		Wait(1500)
 		ClearPedTasks(ped)
 		blocked = false
 	end
@@ -658,17 +634,18 @@ end
 
 --Draws all other weapons
 function drawWeapon(ped, newWeapon)
-	if newWeapon == GetHashKey("WEAPON_UNARMED") then
+	if newWeapon == joaat("WEAPON_UNARMED") then
 		return
 	end
 	if checkWeapon(ped, newWeapon) then
 		pos = GetEntityCoords(ped, true)
 		rot = GetEntityHeading(ped)
 		blocked = true
+		BlockInputs()
 		loadAnimDict( "reaction@intimidation@1h" )
 		TaskPlayAnimAdvanced(ped, "reaction@intimidation@1h", "intro", GetEntityCoords(ped, true), 0, 0, rot, 8.0, 3.0, -1, 50, 0.325, 0, 0)
 		SetCurrentPedWeapon(ped, newWeapon, true)
-		Citizen.Wait(600)
+		Wait(600)
 		ClearPedTasks(ped)
 		blocked = false
 	else
@@ -681,59 +658,50 @@ end
 
 function checkWeapon(ped, newWeapon)
 	for i = 1, #weaponsFull do
-		if GetHashKey(weaponsFull[i]) == newWeapon then
+		if joaat(weaponsFull[i]) == newWeapon then
 			return true
 		end
 	end
 	return false
 end
 
-------------- STOP GANG WEAPON -------------------------
+---------HOLSTER ANIMATION --------------------
 
----------HOLSTER ANIMATION Z --------------------
-
---- Function for hand on holster
-Citizen.CreateThread( function()
-
-	while true do
-		Citizen.Wait(0)
-		if (IsControlJustPressed(0,holsterButton)) then
-			local ped2 = GetPlayerPed( -1 )
-			if ( DoesEntityExist( ped2 ) and not IsEntityDead( ped2 )) and not IsPedInAnyVehicle(ped2, true) then
-				loadAnimDict( "move_m@intimidation@cop@unarmed" )
-				if ( IsEntityPlayingAnim( ped2, "move_m@intimidation@cop@unarmed", "idle", 3 ) ) then
-						ClearPedSecondaryTask(ped2)
-						SetCurrentPedWeapon(ped2, GetHashKey("WEAPON_UNARMED"), true)
-						handOnHolster = false
-				else
-						TaskPlayAnim(ped2, "move_m@intimidation@cop@unarmed", "idle", 8.0, 2.5, -1, 49, 0, 0, 0, 0 )
-						SetCurrentPedWeapon(ped2, GetHashKey("WEAPON_UNARMED"), true)
-						handOnHolster = true
-						holsterHold = true
-						Citizen.Wait(1000)
-						holsterHold = false
-				end    
-			end
-		end
+RegisterCommand("holster", function()
+	local ped = PlayerPedId()
+	if ( DoesEntityExist( ped ) and not IsEntityDead( ped )) and not IsPedInAnyVehicle(ped, true) then
+		loadAnimDict( "move_m@intimidation@cop@unarmed" )
+		if ( IsEntityPlayingAnim( ped, "move_m@intimidation@cop@unarmed", "idle", 3 ) ) then
+			ClearPedSecondaryTask(ped)
+			SetCurrentPedWeapon(ped, joaat("WEAPON_UNARMED"), true)
+			handOnHolster = false
+		else
+			TaskPlayAnim(ped, "move_m@intimidation@cop@unarmed", "idle", 8.0, 2.5, -1, 49, 0, 0, 0, 0 )
+			SetCurrentPedWeapon(ped, joaat("WEAPON_UNARMED"), true)
+			handOnHolster = true
+			holsterHold = true
+			Wait(1000)
+			holsterHold = false
+		end    
 	end
 end)
 
-----------END HOLSTER ANIMATION Z
+RegisterKeyMapping("holster", "Holster Weapons", "keyboard", "z")
 
 --------- BLOCKS PLAYER ACTIONS -----------------
-Citizen.CreateThread(function()
-    while true do
-        Citizen.Wait(0)
-            if blocked then
-                DisableControlAction(1, 25, true )
-                DisableControlAction(1, 140, true)
-                DisableControlAction(1, 141, true)
-                DisableControlAction(1, 142, true)
-                DisableControlAction(1, 23, true)
-				DisableControlAction(1, 37, true) -- Disables INPUT_SELECT_WEAPON (TAB)
-				DisableControlAction(1, 182, true)  -- Disables L
-				DisablePlayerFiring(ped, true) -- Disable weapon firing
-            end
+function BlockInputs()
+CreateThread(function()
+    while blocked do
+		local Sleep = 0
+        DisableControlAction(1, 25, true )
+        DisableControlAction(1, 140, true)
+        DisableControlAction(1, 141, true)
+        DisableControlAction(1, 142, true)
+        DisableControlAction(1, 23, true)
+		DisableControlAction(1, 37, true) -- Disables INPUT_SELECT_WEAPON (TAB)
+		DisableControlAction(1, 182, true)  -- Disables L
+		DisablePlayerFiring(ped, true) -- Disable weapon firing
+		Wait(Sleep)
     end
 end)
 --------- BLOCKS PLAYER ACTIONS -----------------
@@ -742,6 +710,6 @@ end)
 function loadAnimDict(dict)
 	while (not HasAnimDictLoaded(dict)) do
 		RequestAnimDict(dict)
-		Citizen.Wait(5)
+		Wait(5)
 	end
 end
