@@ -1,19 +1,6 @@
-# ESX Holster
+# Standalone Holster System
 
-Script by Otacon - Founder of Insomnia RP
-
-**References for code used to help create script:**
-
-- https://github.com/Guy293/esx_guy293_HolsterWeapon
-
-- https://github.com/minipunch/weapons-on-back
-
-- Gang Holster by aka lucifer - Was taken down on github
-
-## ABOUT
-**FiveM Server Dependencies**
-- ESX
-- EUP for visible hoslters
+ESX Holder, brought into 2023, completely rewrote and optimised!
 
 **This Script allows you to:**
 - select multiple holsters for your character in game and removes pistol when drawn from holster - EUP REQUIRED
@@ -28,11 +15,7 @@ Script by Otacon - Founder of Insomnia RP
  - /holster 0-3 selects which holster to use - EUP Required
  - There is a quickdraw bound to Z
  - /rack puts gun in car
- 
- ## DISCLAIMER
- 
- This Github is inactive and will not be updated any further.
- 
- ## License
 
+ ## License
+Original Script by Otacon
 - **[GNU General Public License v3.0](https://github.com/Dr-Otacon/esx_holster/blob/master/LICENSE)**
