@@ -361,32 +361,7 @@ end, false)
 
 function rackWeapon()
 	local door = isNearDoor()
-	if (door == 'driver' or door == 'passenger') then
-		blocked = true
-		BlockInputs()
-		local coordA = GetEntityCoords(ped)
-		local coordB = GetOffsetFromEntityInWorldCoords(ped, 0.0, 2.0, 0.0)
-		local vehicle = getVehicleInDirection(coordA, coordB)
-		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
-			if door == 'driver' then
-				SetVehicleDoorOpen(vehicle, 0, false, false)
-			elseif door == 'passenger' then
-				SetVehicleDoorOpen(vehicle, 1, false, false)
-			end
-		end
-		removeWeaponOnBack()
-		startAnim("mini@repair", "fixing_a_ped")
-		blocked = false
-		if DoesEntityExist(vehicle) and IsEntityAVehicle(vehicle) then
-			if door == 'driver' then
-				SetVehicleDoorShut(vehicle, 0, false, false)
-			elseif door == 'passenger' then
-				SetVehicleDoorShut(vehicle, 1, false, false)
-			end
-		end
-		WeaponL = joaat("WEAPON_UNARMED")
-		
-	elseif isNearTrunk() then
+	if isNearTrunk() then
 		blocked = true
 		BlockInputs()
 		removeWeaponOnBack()
