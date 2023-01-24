@@ -690,20 +690,21 @@ RegisterKeyMapping("holster", "Holster Weapons", "keyboard", "z")
 
 --------- BLOCKS PLAYER ACTIONS -----------------
 function BlockInputs()
-CreateThread(function()
-    while blocked do
-		local Sleep = 0
-        DisableControlAction(1, 25, true )
-        DisableControlAction(1, 140, true)
-        DisableControlAction(1, 141, true)
-        DisableControlAction(1, 142, true)
-        DisableControlAction(1, 23, true)
-		DisableControlAction(1, 37, true) -- Disables INPUT_SELECT_WEAPON (TAB)
-		DisableControlAction(1, 182, true)  -- Disables L
-		DisablePlayerFiring(ped, true) -- Disable weapon firing
-		Wait(Sleep)
-    end
-end)
+	CreateThread(function()
+		while blocked do
+			local Sleep = 0
+			DisableControlAction(1, 25, true )
+			DisableControlAction(1, 140, true)
+			DisableControlAction(1, 141, true)
+			DisableControlAction(1, 142, true)
+			DisableControlAction(1, 23, true)
+			DisableControlAction(1, 37, true) -- Disables INPUT_SELECT_WEAPON (TAB)
+			DisableControlAction(1, 182, true)  -- Disables L
+			DisablePlayerFiring(ped, true) -- Disable weapon firing
+			Wait(Sleep)
+		end
+	end)
+end
 --------- BLOCKS PLAYER ACTIONS -----------------
 
 --Loads Animation Dictionary
